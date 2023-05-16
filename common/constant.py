@@ -19,8 +19,8 @@ source_file_type = {
     "xlsx": "Excel表格(.xlsx)",
     "pptx": "演示文档(.pptx)",
     "image": "图片文件(.png)",
-    "txt": "纯文本(.txt)",
-    "html": "网页文件(.html)",
+    # "txt": "纯文本(.txt)",
+    # "html": "网页文件(.html)",
 }
 
 

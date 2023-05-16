@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import os.path
+import time
 
-import comtypes
+import win32com.client
 from docx2pdf import convert
-
+from fpdf import FPDF
 
 from common import file_util
 from fileconv.converter import FileConverter
@@ -12,12 +13,15 @@ from fileconv.converter import FileConverter
 class PDFConverter(FileConverter):
     def __init__(self):
         super(PDFConverter, self).__init__()
+        self.images = []
 
-    def trans_form(self, file_path: str):
+    def trans_form(self, file_path):
         ext = file_util.get_file_ext(file_path)
+        out_file_name = file_util.get_output_path(file_path, '.pdf')
+        if os.path.exists(out_file_name):
+            os.remove(out_file_name)
         if ext == "xlsx":
             from win32com.client import DispatchEx
-            out_file_name = file_util.get_output_path(file_path, ".pdf")
             try:
                 xlApp = DispatchEx("Excel.Application")
                 xlApp.Visible = False
@@ -30,19 +34,24 @@ class PDFConverter(FileConverter):
                 books.Close(False)
                 xlApp.Quit()
         elif ext == "docx":
-            out_file_name = file_util.get_output_path(file_path, '.pdf')
-            if os.path.exists(out_file_name):
-                os.remove(out_file_name)
             convert(file_path, out_file_name)
             return out_file_name
         elif ext in ['ppt', 'pptx']:
-            out_file_name = file_util.get_output_path(file_path, '.pdf')
-            if os.path.exists(out_file_name):
-                os.remove(out_file_name)
-            powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
-            powerpoint.Visible = 1
-            deck = powerpoint.Presentations.Open(file_path)
-            deck.SaveAs(out_file_name, 32)  # formatType = 32 for ppt to pdf
-            deck.Close()
+            ppt_app = win32com.client.Dispatch('PowerPoint.Application')
+            ppt = ppt_app.Presentations.Open(file_path)
+            ppt.SaveAs(out_file_name, 32)
+            ppt_app.Quit()
             return out_file_name
 
+    def images_to_pdf(self):
+        pdf = FPDF()
+        pdf.set_auto_page_break(0)  # 自动分页设为False
+        out_file_name = str(time.process_time_ns()) + ".pdf"
+        file_path = ""
+        for image in sorted(self.images):
+            file_path = file_util.get_file_path(image)
+            pdf.add_page()
+            pdf.image(image, w=190)  # 指定宽高
+        out_file_name = os.path.join(file_path, out_file_name)
+        pdf.output(out_file_name, "F")
+        return out_file_name

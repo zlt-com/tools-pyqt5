@@ -1,9 +1,6 @@
 import os
 
 from common import file_util, constant
-from fileconv import pdf, excel
-from fileconv import word
-import threading
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from ui import Ui_MainPage
@@ -38,7 +35,9 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
     def btn_select_file(self):
         # self.selected_dir = QFileDialog.getExistingDirectory(self, caption='选择文件夹', directory=os.getcwd())
         file_type = "*." + self.source_file_type_select.currentData()
-        root = 'C:/Users/jerry/Documents/'
+        if self.source_file_type_select.currentData() == "image":
+            file_type = "*.jpg;*.jpeg;*.png"
+        root = '.'
         self.selected_dir = QFileDialog.getOpenFileNames(self, caption='选择文件', directory=root, filter=file_type)
         self.file_conv_path.setText(';'.join(self.selected_dir[0]))
         # print(self.selected_dir)
@@ -65,31 +64,42 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         else:
             self.files = file_path_text.split(";")
         # 有可转换文件
+        log_file_name = ""
         if len(self.files) > 0:
             try:
                 self.file_conv_progress_bar.setMaximum(len(self.files))
                 self.file_conv_progress_bar.show()
-                for f in self.files:
-                    t = threading.Thread(self.converter(f))
-                    t.start()
-                    # t.join()
+                if self.source_file_type_select.currentData() == "image":
+                    self.converter(self.files)
+                else:
+                    for f in self.files:
+                        log_file_name = f
+                        self.converter(f)
                 while self.conv_count == len(self.files):
                     print("转换结束，跳出循环")
                     break
             except Exception as e:
                 print(e)
                 self.file_conv_result_text. \
-                    setPlainText(self.file_conv_result_text.toPlainText() + f + " 转换失败。" + "\r\n")
+                    setPlainText(self.file_conv_result_text.toPlainText() + log_file_name + " 转换失败。" + "\r\n")
         # self.btn_file_conv.setDisabled(False)
 
     def converter(self, f):
         from fileconv.factory import ConverterFactory
         converter = ConverterFactory(self.target_file_type_select.currentData()).get_converter()
-        converter.trans_form(f)
-        self.conv_count += 1
+        log_file_name = ""
+        if self.source_file_type_select.currentData() == "image":
+            converter.images = self.files
+            converter.images_to_pdf()
+            log_file_name = str(self.files)
+            self.conv_count += len(self.files)
+        else:
+            converter.trans_form(f)
+            log_file_name = f
+            self.conv_count += 1
         self.file_conv_progress_bar.setValue(self.conv_count)
         self.file_conv_result_text. \
-            setPlainText(self.file_conv_result_text.toPlainText() + f
+            setPlainText(self.file_conv_result_text.toPlainText() + log_file_name
                          + " 转换为：" + self.target_file_type_select.currentText() + "\r\n")
 
 

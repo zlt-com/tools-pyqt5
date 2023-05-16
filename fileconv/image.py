@@ -13,6 +13,7 @@ class ImageConverter(FileConverter):
         super(ImageConverter, self).__init__()
         self.file_name = ""
         self.files = []
+        self.images = []
 
     def trans_form(self, file_path: str):
         ext = file_util.get_file_ext(file_path)
@@ -59,3 +60,5 @@ class ImageConverter(FileConverter):
             img = cv2.imread(f)
             images.append(img)
         cv2.imwrite(self.file_name, cv2.vconcat(images))
+
+
