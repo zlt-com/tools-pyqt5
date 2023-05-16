@@ -22,7 +22,7 @@ def file_list(path, ext=""):
                 doc_list.append(os.path.join(path, file))
             else:
                 pass
-    return doc_list
+    return doc_list, dir_list
 
 
 # 获取新文件的输出路径，与旧文件在同一目录
@@ -41,3 +41,8 @@ def get_file_shot_name(source_file):
 # 文件路径
 def get_file_path(source_file):
     return os.path.split(os.path.realpath(source_file))[0]
+
+
+# 文件扩展名
+def get_file_ext(source_file):
+    return os.path.splitext(source_file)[-1][1:]

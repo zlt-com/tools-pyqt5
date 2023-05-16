@@ -1,33 +1,18 @@
-from docx2pdf import convert
-import docx2txt
-import os
-import mammoth
+from pdf2docx import Converter
+
 from common import file_util
+from fileconv.converter import FileConverter
 
 
-def docx_to_pdf(source_file):
-    out_file_name = file_util.get_output_path(source_file, '.pdf')
-    if os.path.exists(out_file_name):
-        os.remove(out_file_name)
-    convert(source_file, out_file_name)
-    return out_file_name
+class DocxConverter(FileConverter):
+    def __init__(self):
+        super(DocxConverter, self).__init__()
 
-
-def docx_to_txt(source_file):
-    out_file_name = file_util.get_output_path(source_file, '.txt')
-    text = docx2txt.process(source_file)
-    out_file = open(out_file_name, "w", encoding='utf-8')
-    out_file.write(text)
-    out_file.close()
-    return out_file_name
-
-
-def docx_to_html(source_file):
-    out_file_name = file_util.get_output_path(source_file, '.html')
-    with open(source_file, "rb") as docx_file:
-        result = mammoth.convert_to_html(docx_file)
-        html = result.value
-        out_file = open(out_file_name, "w", encoding='utf-8')
-        out_file.write(html)
-        out_file.close()
-    return out_file_name
+    def trans_form(self, file_path: str):
+        ext = file_util.get_file_ext(file_path)
+        if ext == "pdf":
+            conv = Converter(file_path)
+            out_file_name = file_util.get_output_path(file_path, ".docx")
+            conv.convert(out_file_name)
+            conv.close()
+            return out_file_name

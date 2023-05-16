@@ -30,7 +30,7 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="1" column="0" alignment="Qt::AlignHCenter">
+           <item row="2" column="0" alignment="Qt::AlignHCenter">
             <widget class="QLabel" name="label_7">
              <property name="minimumSize">
               <size>
@@ -43,77 +43,7 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QPushButton" name="btn_file_conv">
-             <property name="minimumSize">
-              <size>
-               <width>848</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-              </font>
-             </property>
-             <property name="autoFillBackground">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>开始转换</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QComboBox" name="file_ext_select">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>12</pointsize>
-              </font>
-             </property>
-             <property name="currentText">
-              <string extracomment="注释">PDF</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>PDF</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>图片（png)</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>纯文本（txt）</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>网页文件（html)</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>word文件（docx）</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="7" column="1" alignment="Qt::AlignHCenter">
+           <item row="9" column="1" alignment="Qt::AlignHCenter">
             <widget class="QLabel" name="label_3">
              <property name="minimumSize">
               <size>
@@ -126,7 +56,20 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>目标文件格式</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
             <widget class="QLabel" name="label_6">
              <property name="minimumSize">
               <size>
@@ -139,12 +82,12 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <widget class="QLineEdit" name="file_conv_path">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>30</height>
+               <height>40</height>
               </size>
              </property>
             </widget>
@@ -158,24 +101,29 @@
               </size>
              </property>
              <property name="text">
-              <string>源文件类型</string>
+              <string>源文件格式</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_5">
+           <item row="1" column="1">
+            <widget class="QComboBox" name="target_file_type_select">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>50</height>
+               <height>30</height>
               </size>
              </property>
-             <property name="text">
-              <string>目标文件格式</string>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="currentText">
+              <string extracomment="注释"/>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
+           <item row="8" column="1">
             <widget class="QProgressBar" name="file_conv_progress_bar">
              <property name="minimumSize">
               <size>
@@ -196,11 +144,34 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QComboBox" name="source_file_type_select">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="10" column="1">
+            <widget class="QTextEdit" name="file_conv_result_text"/>
+           </item>
+           <item row="2" column="2">
             <widget class="QPushButton" name="btn_file_con_select">
              <property name="minimumSize">
               <size>
                <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
                <height>40</height>
               </size>
              </property>
@@ -214,43 +185,18 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QRadioButton" name="source_file_type">
-               <property name="text">
-                <string>文档</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="source_file_type_2">
-               <property name="text">
-                <string>PDF</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="source_file_type_3">
-               <property name="text">
-                <string>表格</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="source_file_type_4">
-               <property name="text">
-                <string>图片</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="8" column="1">
-            <widget class="QTextEdit" name="file_conv_result_text"/>
+           <item row="3" column="1">
+            <widget class="QPushButton" name="btn_file_conv">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>开始转换</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -270,34 +216,50 @@
  <resources/>
  <connections>
   <connection>
-   <sender>btn_file_conv</sender>
-   <signal>clicked()</signal>
-   <receiver>MainPage</receiver>
-   <slot>btn_conv()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>344</x>
-     <y>167</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>714</x>
-     <y>-3</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btn_file_con_select</sender>
    <signal>clicked()</signal>
    <receiver>MainPage</receiver>
    <slot>btn_select_file()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>431</x>
-     <y>82</y>
+     <x>965</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>752</x>
-     <y>-9</y>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn_file_conv</sender>
+   <signal>clicked()</signal>
+   <receiver>MainPage</receiver>
+   <slot>btn_conv()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>382</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>472</x>
+     <y>-15</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>source_file_type_select</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainPage</receiver>
+   <slot>target_file_type_select_change()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>344</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -305,5 +267,6 @@
  <slots>
   <slot>btn_select_file()</slot>
   <slot>btn_conv()</slot>
+  <slot>target_file_type_select_change()</slot>
  </slots>
 </ui>
