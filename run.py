@@ -11,6 +11,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         super(Run, self).__init__()
         self.setupUi(self)
         self.selected_dir = []
+        self.save_dir = ''
         self.files = []
         self.file_conv_progress_bar.hide()
         self.conv_count = 0
@@ -42,11 +43,19 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.file_conv_path.setText(';'.join(self.selected_dir[0]))
         # print(self.selected_dir)
 
+    # 选择转换后保存目录
+    def file_conv_select_save_directory(self):
+        self.save_dir = QFileDialog.getExistingDirectory(self, caption='选择转换保存文件夹', directory="")
+        self.tab1_txt_file_save_directory.setText(self.save_dir)
+
     # 转换按钮
     def btn_conv(self):
-        # self.btn_file_conv.setDisabled(True)
         if self.file_conv_path.text() == "":
             QMessageBox.about(self, "提醒", "文件路径不能为空")
+            return
+        out_put_dir = self.tab1_txt_file_save_directory.text()
+        if not file_util.is_dir(out_put_dir):
+            QMessageBox.about(self, "提醒", "文件转换后保存路径不能为空并真实存在")
             return
         self.init_ui_text()
         self.file_conv_result_text.setPlainText("开始转换：\r\n")
@@ -55,9 +64,9 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.files = []
         file_path_text = self.file_conv_path.text()
         # 如果是文件夹就遍历
-        if os.path.isdir(file_path_text):
-            file_type = "." + self.source_file_type_select.currentData()
-            self.files, _ = file_util.get_files_all(file_path_text, file_type)
+        if file_util.is_dir(file_path_text):
+            file_type = self.source_file_type_select.currentData()
+            self.files, _ = file_util.get_files_all(file_path_text, [file_type])
             if len(self.files) == 0:
                 pass
         # 不是文件夹就是文件
@@ -70,11 +79,11 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                 self.file_conv_progress_bar.setMaximum(len(self.files))
                 self.file_conv_progress_bar.show()
                 if self.source_file_type_select.currentData() == "image":
-                    self.converter(self.files)
+                    self.converter(self.files, out_put_dir)
                 else:
                     for f in self.files:
                         log_file_name = f
-                        self.converter(f)
+                        self.converter(f, out_put_dir)
                 while self.conv_count == len(self.files):
                     print("转换结束，跳出循环")
                     break
@@ -84,17 +93,16 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                     setPlainText(self.file_conv_result_text.toPlainText() + log_file_name + " 转换失败。" + "\r\n")
         # self.btn_file_conv.setDisabled(False)
 
-    def converter(self, f):
+    def converter(self, f, out_put_dir):
         from fileconv.factory import ConverterFactory
         converter = ConverterFactory(self.target_file_type_select.currentData()).get_converter()
-        log_file_name = ""
         if self.source_file_type_select.currentData() == "image":
             converter.images = self.files
-            converter.images_to_pdf()
+            converter.images_to_pdf(out_put_dir=out_put_dir)
             log_file_name = str(self.files)
             self.conv_count += len(self.files)
         else:
-            converter.transform(f)
+            converter.transform(f, out_put_dir=out_put_dir)
             log_file_name = f
             self.conv_count += 1
         self.file_conv_progress_bar.setValue(self.conv_count)

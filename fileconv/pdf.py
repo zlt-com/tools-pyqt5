@@ -15,9 +15,9 @@ class PDFConverter(FileConverter):
         super(PDFConverter, self).__init__()
         self.images = []
 
-    def transform(self, file_path):
+    def transform(self, file_path, out_put_dir=""):
         ext = file_util.get_file_ext(file_path)
-        out_file_name = file_util.get_output_path(file_path, '.pdf')
+        out_file_name = file_util.get_output_path(file_path, '.pdf', out_put_dir)
         if os.path.exists(out_file_name):
             os.remove(out_file_name)
         if ext == "xlsx":
@@ -43,7 +43,7 @@ class PDFConverter(FileConverter):
             ppt_app.Quit()
             return out_file_name
 
-    def images_to_pdf(self):
+    def images_to_pdf(self, out_put_dir=""):
         pdf = FPDF()
         pdf.set_auto_page_break(0)  # 自动分页设为False
         out_file_name = str(time.process_time_ns()) + ".pdf"
@@ -52,6 +52,6 @@ class PDFConverter(FileConverter):
             file_path = file_util.get_file_path(image)
             pdf.add_page()
             pdf.image(image, w=190)  # 指定宽高
-        out_file_name = os.path.join(file_path, out_file_name)
+        out_file_name = os.path.join(out_put_dir if out_put_dir != "" else file_path, out_file_name)
         pdf.output(out_file_name, "F")
         return out_file_name

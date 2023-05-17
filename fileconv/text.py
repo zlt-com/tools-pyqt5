@@ -13,17 +13,17 @@ class TxtConverter(FileConverter):
     def __init__(self):
         super(TxtConverter, self).__init__()
 
-    def transform(self, file_path: str):
+    def transform(self, file_path, out_put_dir=""):
         ext = file_util.get_file_ext(file_path)
         if ext == "docx":
-            out_file_name = file_util.get_output_path(file_path, '.txt')
+            out_file_name = file_util.get_output_path(file_path, '.txt', out_put_dir)
             text = docx2txt.process(file_path)
             out_file = open(out_file_name, "w", encoding='utf-8')
             out_file.write(text)
             out_file.close()
             return out_file_name
         elif ext == "pdf":
-            out_file_name = file_util.get_output_path(file_path, ".txt")
+            out_file_name = file_util.get_output_path(file_path, ".txt", out_put_dir)
             output = open(out_file_name, 'w', encoding='utf-8')
             rm = PDFResourceManager()
             lap = LAParams()
@@ -36,6 +36,6 @@ class TxtConverter(FileConverter):
             output.close()
             return out_file_name
         elif ext == "xlsx":
-            out_file_name = file_util.get_output_path(file_path, ".txt")
+            out_file_name = file_util.get_output_path(file_path, ".txt", out_put_dir)
             excel = pandas.read_excel(file_path)
             excel.to_string(out_file_name)

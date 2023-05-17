@@ -15,10 +15,10 @@ class HtmlConverter(FileConverter):
     def __init__(self):
         super(HtmlConverter, self).__init__()
 
-    def transform(self, file_path: str):
+    def transform(self, file_path, out_put_dir=""):
         ext = file_util.get_file_ext(file_path)
         if ext == "docx":
-            out_file_name = file_util.get_output_path(file_path, '.html')
+            out_file_name = file_util.get_output_path(file_path, '.html', out_put_dir)
             with open(file_path, "rb") as docx_file:
                 result = mammoth.convert_to_html(docx_file)
                 html = result.value
@@ -27,7 +27,7 @@ class HtmlConverter(FileConverter):
                 out_file.close()
             return out_file_name
         elif ext == "pdf":
-            out_file_name = file_util.get_output_path(file_path, ".html")
+            out_file_name = file_util.get_output_path(file_path, ".html", out_put_dir)
             output = open(out_file_name, 'w', encoding='utf-8')
             source_io = BytesIO()
             rm = PDFResourceManager()
@@ -42,7 +42,7 @@ class HtmlConverter(FileConverter):
             output.close()
             return out_file_name
         elif ext == "xlsx":
-            out_file_name = file_util.get_output_path(file_path, ".html")
+            out_file_name = file_util.get_output_path(file_path, ".html", out_put_dir)
             excel = pandas.read_excel(file_path)
             excel.to_html(out_file_name)
             return out_file_name
