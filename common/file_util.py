@@ -4,8 +4,29 @@
 import os
 
 
-# 文件列表
-def file_list(path, ext=""):
+# 文件列表,包括子目录
+def get_files_all(path, ext=""):
+    dir_list = []
+    doc_list = []
+    try:
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if os.path.isdir(file):
+                    dir_list.append(file)
+                else:
+                    if ext == "":
+                        doc_list.append(os.path.join(root, file))
+                    elif os.path.splitext(file)[1] == ext:
+                        doc_list.append(os.path.join(root, file))
+    except Exception as e:
+        print(e)
+        return
+
+    return doc_list, dir_list
+
+
+# 获取当前文件夹文件，不搜索子目录
+def get_files(path, ext):
     dir_list = []
     doc_list = []
     files = os.listdir(path)
@@ -23,7 +44,6 @@ def file_list(path, ext=""):
             else:
                 pass
     return doc_list, dir_list
-
 
 # 获取新文件的输出路径，与旧文件在同一目录
 def get_output_path(source_file, ext):

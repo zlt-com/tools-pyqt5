@@ -37,7 +37,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         file_type = "*." + self.source_file_type_select.currentData()
         if self.source_file_type_select.currentData() == "image":
             file_type = "*.jpg;*.jpeg;*.png"
-        root = '.'
+        root = 'C:/Users/jerry/Documents/'
         self.selected_dir = QFileDialog.getOpenFileNames(self, caption='选择文件', directory=root, filter=file_type)
         self.file_conv_path.setText(';'.join(self.selected_dir[0]))
         # print(self.selected_dir)
@@ -56,8 +56,8 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         file_path_text = self.file_conv_path.text()
         # 如果是文件夹就遍历
         if os.path.isdir(file_path_text):
-            file_type = "*." + self.source_file_type_select.currentData()
-            self.files = file_util.file_list(file_path_text, file_type)
+            file_type = "." + self.source_file_type_select.currentData()
+            self.files, _ = file_util.get_files_all(file_path_text, file_type)
             if len(self.files) == 0:
                 pass
         # 不是文件夹就是文件
@@ -94,13 +94,25 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
             log_file_name = str(self.files)
             self.conv_count += len(self.files)
         else:
-            converter.trans_form(f)
+            converter.transform(f)
             log_file_name = f
             self.conv_count += 1
         self.file_conv_progress_bar.setValue(self.conv_count)
         self.file_conv_result_text. \
             setPlainText(self.file_conv_result_text.toPlainText() + log_file_name
-                         + " 转换为：" + self.target_file_type_select.currentText() + "\r\n")
+                         + " 转换为" + self.target_file_type_select.currentText() + "成功。\r\n")
+
+    def parser_web_site_content(self):
+        from web import parser_gov
+        try:
+            content = parser_gov.parser(self.tab2_txt_web_url.text(), self.tab2_txt_key.text())
+            for i in range(2, 22):
+                url = self.tab2_txt_web_pages.text().format(str(i))
+                print(url)
+                content += parser_gov.parser(url, self.tab2_txt_key.text())
+            self.tab2_text_content.setPlainText(content)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":

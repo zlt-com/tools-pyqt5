@@ -8,7 +8,7 @@ class DocxConverter(FileConverter):
     def __init__(self):
         super(DocxConverter, self).__init__()
 
-    def trans_form(self, file_path: str):
+    def transform(self, file_path: str):
         ext = file_util.get_file_ext(file_path)
         if ext == "pdf":
             conv = Converter(file_path)

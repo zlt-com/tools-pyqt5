@@ -21,6 +21,9 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>文件转换</string>
@@ -206,8 +209,122 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>政府网站工作简化</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="tab2_txt_web_pages">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>http://www.zhalute.gov.cn/zltq/xzfgui/xxgklist_{0}.shtml</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QTextEdit" name="tab2_text_content"/>
+         </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="tab2_btn_get_web_site_content">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>获取内容</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="tab2_txt_web_tag">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="placeholderText">
+            <string>标签用,分割</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>分页设置</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>网页地址</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="tab2_txt_web_url">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>http://www.zhalute.gov.cn/zltq/xzfgui/xxgklist.shtml</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>解析标签</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>关键地址</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="tab2_txt_key">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>xzfgui</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -222,12 +339,12 @@
    <slot>btn_select_file()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>965</x>
-     <y>204</y>
+     <x>878</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
-     <x>752</x>
-     <y>0</y>
+     <x>901</x>
+     <y>-2</y>
     </hint>
    </hints>
   </connection>
@@ -238,12 +355,28 @@
    <slot>btn_conv()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>382</x>
-     <y>239</y>
+     <x>298</x>
+     <y>227</y>
     </hint>
     <hint type="destinationlabel">
-     <x>472</x>
-     <y>-15</y>
+     <x>7</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_btn_get_web_site_content</sender>
+   <signal>clicked()</signal>
+   <receiver>MainPage</receiver>
+   <slot>parser_web_site_content()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>205</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>989</x>
+     <y>241</y>
     </hint>
    </hints>
   </connection>
@@ -254,12 +387,12 @@
    <slot>target_file_type_select_change()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>344</x>
-     <y>71</y>
+     <x>285</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel">
-     <x>400</x>
-     <y>0</y>
+     <x>291</x>
+     <y>1</y>
     </hint>
    </hints>
   </connection>
@@ -268,5 +401,6 @@
   <slot>btn_select_file()</slot>
   <slot>btn_conv()</slot>
   <slot>target_file_type_select_change()</slot>
+  <slot>parser_web_site_content()</slot>
  </slots>
 </ui>

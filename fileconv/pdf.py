@@ -15,7 +15,7 @@ class PDFConverter(FileConverter):
         super(PDFConverter, self).__init__()
         self.images = []
 
-    def trans_form(self, file_path):
+    def transform(self, file_path):
         ext = file_util.get_file_ext(file_path)
         out_file_name = file_util.get_output_path(file_path, '.pdf')
         if os.path.exists(out_file_name):

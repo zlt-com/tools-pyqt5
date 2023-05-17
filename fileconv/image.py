@@ -15,7 +15,7 @@ class ImageConverter(FileConverter):
         self.files = []
         self.images = []
 
-    def trans_form(self, file_path: str):
+    def transform(self, file_path: str):
         ext = file_util.get_file_ext(file_path)
         if ext == "pdf":
             pdf_doc = fitz.open(file_path)
@@ -46,19 +46,5 @@ class ImageConverter(FileConverter):
                 result = cv2.vconcat(images)
                 cv2.imwrite(os.path.join(file_util.get_file_path(file_path), str(time.process_time_ns()) + ".png"),
                             result)
-
-    def image_h_concat(self):
-        images = []
-        for f in self.files:
-            img = cv2.imread(f)
-            images.append(img)
-        cv2.imwrite(self.file_name, cv2.hconcat(images))
-
-    def image_v_concat(self):
-        images = []
-        for f in self.files:
-            img = cv2.imread(f)
-            images.append(img)
-        cv2.imwrite(self.file_name, cv2.vconcat(images))
 
 

@@ -15,7 +15,7 @@ class HtmlConverter(FileConverter):
     def __init__(self):
         super(HtmlConverter, self).__init__()
 
-    def trans_form(self, file_path: str):
+    def transform(self, file_path: str):
         ext = file_util.get_file_ext(file_path)
         if ext == "docx":
             out_file_name = file_util.get_output_path(file_path, '.html')
