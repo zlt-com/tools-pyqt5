@@ -16,6 +16,7 @@ file_type = {
 source_file_type = {
     "pdf": "PDF(.pdf)",
     "docx": "Word文档(.docx)",
+    "doc": "Word文档(.doc)",
     "xlsx": "Excel表格(.xlsx)",
     "pptx": "演示文档(.pptx)",
     "image": "图片文件(.png)",
@@ -28,7 +29,7 @@ def get_can_convert_file_type(source):
     can_convert_file_type = {
         "pdf": ["docx", "image", "txt", "html"],
         "docx": ["pdf", "html", "txt"],
-        # "doc": ["docx"],
+        "doc": ["docx"],
         "xlsx": ["pdf", "json", "csv", "txt", "html"],
         # "xls": ["xlsx"],
         "pptx": ["pdf"],

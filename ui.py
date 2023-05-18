@@ -218,7 +218,7 @@ class Ui_MainPage(object):
         self.gridLayout.addWidget(self.tab_main, 0, 0, 1, 1)
 
         self.retranslateUi(MainPage)
-        self.tab_main.setCurrentIndex(2)
+        self.tab_main.setCurrentIndex(0)
         self.tab_scan_result.setCurrentIndex(1)
         self.btn_file_con_select.clicked.connect(MainPage.btn_select_file) # type: ignore
         self.btn_file_conv.clicked.connect(MainPage.btn_conv) # type: ignore

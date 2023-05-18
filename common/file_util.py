@@ -6,7 +6,7 @@ import string
 
 
 # 文件列表,包括子目录
-def get_files_all(path, ext: []):
+def get_files_all(path, ext=[]):
     dir_list = []
     doc_list = []
     try:
@@ -27,7 +27,7 @@ def get_files_all(path, ext: []):
 
 
 # 获取当前文件夹文件，不搜索子目录
-def get_files(path, ext: []):
+def get_files(path, ext=[]):
     dir_list = []
     doc_list = []
     files = os.listdir(path)
@@ -48,7 +48,7 @@ def get_files(path, ext: []):
 
 
 # 获取新文件的输出路径，与旧文件在同一目录
-def get_output_path(source_file, ext, out_put_dir=""):
+def get_output_path(source_file, ext="", out_put_dir=""):
     file_real_path = os.path.split(os.path.realpath(source_file))
     file_shot_name = get_file_shot_name(source_file)
     out_file_name = os.path.join(os.path.join(file_real_path[0]), file_shot_name + ext)

@@ -1,12 +1,13 @@
 import os
 
+import pythoncom
 from PyQt5.QtCore import pyqtSignal, QThreadPool
 
 from common import file_util, constant
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
-from scan.thread import ScanFileKeywordThread
+from threader.threader import ScanFileKeywordThread, ParserGovHtmlThread, ParserGovHtmlSaveFileThread, FileConvertThread
 from ui import Ui_MainPage
 
 
@@ -20,11 +21,17 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.file_conv_progress_bar.hide()  # 默认文件转换进度条隐藏
         self.conv_count = 0  # 转换的个数
         self.init_file_type_select()  # 初始化转换文件界面的所有控件
+        self.parser_html_file_names = []  # 解析html获取的文件名
         self.scan_files = []  # 扫描出来的文件
         self.parser_keyword_files = []  # 扫描出关键字的文件
         self.pool = QThreadPool()
         self.pool.globalInstance()
-        self.pool.setMaxThreadCount(5)  # 设置最大线程数
+        self.pool.setMaxThreadCount(10)  # 设置最大线程数
+
+        self.file_convert_log_text_signal.connect(self.write_file_convert_log)
+        self.scan_file_log_text_signal.connect(self.write_scan_file_log)
+        self.scan_file_keyword_signal.connect(self.write_parser_scan_file_log)
+        self.parser_html_log_text_signal.connect(self.write_parser_html_log)
 
     def init_ui_text(self):
         self.selected_dir = []
@@ -65,15 +72,17 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.save_dir = QFileDialog.getExistingDirectory(self, caption='选择转换保存文件夹', directory="")
         self.tab1_txt_file_save_directory.setText(self.save_dir)
 
+    file_convert_log_text_signal = pyqtSignal(str)
+
     # 转换按钮
     def btn_conv(self):
         if self.file_conv_path.text() == "":
             QMessageBox.about(self, "提醒", "文件路径不能为空")
             return
         out_put_dir = self.tab1_txt_file_save_directory.text()
-        if not file_util.is_dir(out_put_dir):
-            QMessageBox.about(self, "提醒", "文件转换后保存路径不能为空并真实存在")
-            return
+        # if not file_util.is_dir(out_put_dir):
+        #     QMessageBox.about(self, "提醒", "文件转换后保存路径不能为空并真实存在")
+        #     return
         self.init_ui_text()
         self.file_conv_result_text.setPlainText("开始转换：\r\n")
         self.file_conv_result_text.setPlainText("")
@@ -116,37 +125,52 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         if self.source_file_type_select.currentData() == "image":
             converter.images = self.files
             converter.images_to_pdf(out_put_dir=out_put_dir)
-            log_file_name = str(self.files)
             self.conv_count += len(self.files)
         else:
-            converter.transform(f, out_put_dir=out_put_dir)
-            log_file_name = f
-            self.conv_count += 1
+            thread = FileConvertThread(converter, f, out_put_dir, self.file_convert_log_text_signal)
+            self.pool.start(thread)
+
+    def write_file_convert_log(self, text):
+        self.conv_count += 1
         self.file_conv_progress_bar.setValue(self.conv_count)
-        self.file_conv_result_text. \
-            setPlainText(self.file_conv_result_text.toPlainText() + log_file_name
-                         + " 转换为" + self.target_file_type_select.currentText() + "成功。\r\n")
+        self.file_conv_result_text.setPlainText(text + "\r\n" + self.file_conv_result_text.toPlainText())
 
     '''
     以下为网站文件网页解析
     '''
+    parser_html_log_text_signal = pyqtSignal(str)
 
     def parser_web_site_content(self):
-        from web import parser_gov
         try:
-            content = parser_gov.parser(self.tab2_txt_web_url.text(), self.tab2_txt_key.text())
+            thread = ParserGovHtmlThread(self.tab2_txt_web_url.text(),
+                                         self.parser_html_log_text_signal,
+                                         self.tab2_txt_key.text())
+            self.pool.start(thread)
             for i in range(2, 22):
                 url = self.tab2_txt_web_pages.text().format(str(i))
-                print(url)
-                content += parser_gov.parser(url, self.tab2_txt_key.text())
-            self.tab2_text_content.setPlainText(content)
+                thread = ParserGovHtmlThread(url, self.parser_html_log_text_signal, self.tab2_txt_key.text())
+                self.pool.start(thread)
+            thread = ParserGovHtmlSaveFileThread(self)
+            self.pool.start(thread)
         except Exception as e:
             print(e)
+
+    def write_parser_html_log(self, text):
+        text = text.replace("扎鲁特旗人民政府办公室关于", "") \
+            .replace("扎鲁特旗人民政府关于", "") \
+            .replace("中共扎鲁特旗委办公室", "") \
+            .replace("印发", "") \
+            .replace("《", "") \
+            .replace("》", "") \
+            .replace(" ", "") \
+            .replace("的通知", "")
+        self.parser_html_file_names.extend(text.split("\r\n"))
+        self.tab2_text_content.setText(text + "\r\n" + self.tab2_text_content.toPlainText())
 
     '''
     以下为保密关键字扫描
     '''
-    scan_file_log_text = pyqtSignal(str)
+    scan_file_log_text_signal = pyqtSignal(str)
     scan_file_keyword_signal = pyqtSignal(str)
 
     # 开始扫描并处理
@@ -156,14 +180,10 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
             for disk in disks:
                 files = os.listdir(disk)
         else:
-            from scan.thread import ScanFileLogThread
-            self.scan_file_log_text.connect(self.write_scan_file_log)
-            self.scan_file_keyword_signal.connect(self.write_parser_scan_file_log)
+            from threader.threader import ScanFileLogThread
             d = self.tab3_combox_select_disk.currentText()
-            scan_thread = ScanFileLogThread()
-            scan_thread.disk = d
-            scan_thread.ui = self
-            scan_thread.start()
+            scan_thread = ScanFileLogThread(d, self.scan_file_log_text_signal)
+            self.pool.start(scan_thread)
 
     # 扫描日志写入文本框
     def write_scan_file_log(self, text):
@@ -171,9 +191,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.tab3_text_all_file.setText(text + "\r\n" + self.tab3_text_all_file.toPlainText())
         tab_title = "扫描可分析文件({0})".format(len(self.scan_files))
         self.tab_scan_result.setTabText(0, tab_title)
-        parser_thread = ScanFileKeywordThread()
-        parser_thread.ui = self
-        parser_thread.file = text
+        parser_thread = ScanFileKeywordThread(ui.scan_file_keyword_signal, text)
         self.pool.start(parser_thread)
 
     def write_parser_scan_file_log(self, text):
@@ -193,5 +211,4 @@ if __name__ == "__main__":
     icon.addPixmap(QtGui.QPixmap(ico_path))
     ui.setWindowIcon(icon)
     ui.show()
-    app.exec_()
-    # sys.exit()
+    sys.exit(app.exec_())

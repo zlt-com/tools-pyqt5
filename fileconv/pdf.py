@@ -2,6 +2,7 @@
 import os.path
 import time
 
+import pythoncom
 import win32com.client
 from docx2pdf import convert
 from fpdf import FPDF
@@ -16,6 +17,7 @@ class PDFConverter(FileConverter):
         self.images = []
 
     def transform(self, file_path, out_put_dir=""):
+        pythoncom.CoInitialize()
         ext = file_util.get_file_ext(file_path)
         out_file_name = file_util.get_output_path(file_path, '.pdf', out_put_dir)
         if os.path.exists(out_file_name):
