@@ -115,11 +115,33 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                     break
             except Exception as e:
                 print(e)
+                self.conv_count += 1
                 self.file_conv_result_text. \
                     setPlainText(self.file_conv_result_text.toPlainText() + log_file_name + " 转换失败。" + "\r\n")
         # self.btn_file_conv.setDisabled(False)
 
     def converter(self, f, out_put_dir):
+        from fileconv.factory import ConverterFactory
+        try:
+            converter = ConverterFactory(self.target_file_type_select.currentData()).get_converter()
+            if self.source_file_type_select.currentData() == "image":
+                converter.images = self.files
+                converter.images_to_pdf(out_put_dir=out_put_dir)
+                log_file_name = str(self.files)
+                self.conv_count += len(self.files)
+            else:
+                converter.transform(f, out_put_dir=out_put_dir)
+                log_file_name = f
+                self.conv_count += 1
+            self.file_conv_progress_bar.setValue(self.conv_count)
+            self.file_conv_result_text. \
+                setPlainText(log_file_name
+                             + " 转换为" + self.target_file_type_select.currentText() + "成功。\r\n" +
+                             self.file_conv_result_text.toPlainText())
+        except Exception as e:
+            print(e)
+
+    def converter_mutil_thread(self, f, out_put_dir):
         from fileconv.factory import ConverterFactory
         converter = ConverterFactory(self.target_file_type_select.currentData()).get_converter()
         if self.source_file_type_select.currentData() == "image":
