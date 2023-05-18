@@ -1,13 +1,14 @@
 import os
 
-import pythoncom
 from PyQt5.QtCore import pyqtSignal, QThreadPool
 
+from scan.scan import ParserResult
 from common import file_util, constant
 from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QHeaderView
 
-from threader.threader import ScanFileKeywordThread, ParserGovHtmlThread, ParserGovHtmlSaveFileThread, FileConvertThread
+from threader.threader import ScanFileKeywordThread, ParserGovHtmlThread
+from threader.threader import ParserGovHtmlSaveFileThread, FileConvertThread, ScanFileLogThread
 from ui import Ui_MainPage
 
 
@@ -27,6 +28,9 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.pool = QThreadPool()
         self.pool.globalInstance()
         self.pool.setMaxThreadCount(10)  # 设置最大线程数
+        self.tab3_table_scan_files.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tab3_table_parser_files.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tab3_combox_select_disk.addItem(os.getcwd())
 
         self.file_convert_log_text_signal.connect(self.write_file_convert_log)
         self.scan_file_log_text_signal.connect(self.write_scan_file_log)
@@ -44,6 +48,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
 
     def tab_change(self):
         if self.tab_main.currentIndex() == 2:
+            self.tab3_combox_select_disk.clear()
             disks = file_util.get_disklist()
             for d in disks:
                 self.tab3_combox_select_disk.addItem(d, d)
@@ -193,32 +198,43 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
     以下为保密关键字扫描
     '''
     scan_file_log_text_signal = pyqtSignal(str)
-    scan_file_keyword_signal = pyqtSignal(str)
+    scan_file_keyword_signal = pyqtSignal(ParserResult)
 
     # 开始扫描并处理
     def scan_disk(self):
+        self.pool.
         if self.tab3_checkbox_scan_all_disk.isChecked():
             disks = file_util.get_disklist()
             for disk in disks:
-                files = os.listdir(disk)
+                scan_thread = ScanFileLogThread(disk=disk, signal=self.scan_file_log_text_signal)
+                self.pool.start(scan_thread)
         else:
-            from threader.threader import ScanFileLogThread
             d = self.tab3_combox_select_disk.currentText()
-            scan_thread = ScanFileLogThread(d, self.scan_file_log_text_signal)
+            scan_thread = ScanFileLogThread(disk=d, signal=self.scan_file_log_text_signal)
             self.pool.start(scan_thread)
 
     # 扫描日志写入文本框
     def write_scan_file_log(self, text):
         self.scan_files.append(text)
-        self.tab3_text_all_file.setText(text + "\r\n" + self.tab3_text_all_file.toPlainText())
+        row_count = self.tab3_table_scan_files.rowCount()
+        self.tab3_table_scan_files.insertRow(row_count)
+        self.tab3_table_scan_files.setItem(row_count, 0, QtWidgets.QTableWidgetItem(text))
+        self.tab3_table_scan_files.scrollToBottom()
         tab_title = "扫描可分析文件({0})".format(len(self.scan_files))
         self.tab_scan_result.setTabText(0, tab_title)
-        parser_thread = ScanFileKeywordThread(ui.scan_file_keyword_signal, text)
+        parser_thread = ScanFileKeywordThread(ui.scan_file_keyword_signal, text,
+                                              keyword=ui.tab3_text_keywords.toPlainText().split(" "))
         self.pool.start(parser_thread)
 
-    def write_parser_scan_file_log(self, text):
-        self.parser_keyword_files.append(text)
-        self.tab3_text_parser_file.setText(text + "\r\n" + self.tab3_text_parser_file.toPlainText())
+    def write_parser_scan_file_log(self, result):
+        self.parser_keyword_files.append(result.file)
+        for i in range(len(result.keys)):
+            row_count = self.tab3_table_parser_files.rowCount()
+            self.tab3_table_parser_files.insertRow(row_count)
+            self.tab3_table_parser_files.setItem(row_count, 0, QtWidgets.QTableWidgetItem(result.file))
+            self.tab3_table_parser_files.setItem(row_count, 1, QtWidgets.QTableWidgetItem(result.keys[i]))
+            self.tab3_table_parser_files.setItem(row_count, 2, QtWidgets.QTableWidgetItem(result.context[i]))
+            self.tab3_table_parser_files.scrollToBottom()
         tab_title = "包含关键字的文件({0})".format(len(self.parser_keyword_files))
         self.tab_scan_result.setTabText(1, tab_title)
 

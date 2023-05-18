@@ -10,12 +10,12 @@ from scan.scan import ScanFile
 
 # 扫描文件关键字进程
 class ScanFileLogThread(QRunnable):
-    file_types = ["docx", "txt", "pdf", "xlsx", "html"]
-
-    def __int__(self, disk, signal):
-        super(ScanFileLogThread, self).__init__()
+    def __init__(self, signal, disk):
+        super().__init__()
         self.disk = disk
         self.signal = signal
+
+    file_types = ["docx", "txt", "pdf", "xlsx", "html"]
 
     def iter_file(self, disk):
         try:
@@ -39,19 +39,20 @@ class ScanFileLogThread(QRunnable):
 
 # 解析到关键字的文件
 class ScanFileKeywordThread(QRunnable):
-    def __init__(self, signal, file):
+    def __init__(self, signal, file, keyword):
         super().__init__()
         self.signal = signal
         self.file = file
+        self.keyword = keyword
 
     def run(self):
         try:
-            scan = ScanFile(self.file)
-            file_path = scan.parser_file()
-            if file_path != "":
-                self.signal.emit(file_path)
+            scan = ScanFile(self.file, self.keyword)
+            result = scan.parser_file()
+            if result.file != "":
+                self.signal.emit(result)
         except Exception as e:
-            print(file_path, e)
+            print(e)
 
 
 class ParserGovHtmlThread(QRunnable):
@@ -96,7 +97,6 @@ class ParserGovHtmlSaveFileThread(QRunnable):
 
 
 class FileConvertThread(QRunnable):
-
     def __init__(self, converter, f, out_put_dir, signal):
         super().__init__()
         self.signal = signal
