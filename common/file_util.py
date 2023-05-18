@@ -2,6 +2,7 @@
 
 
 import os
+import string
 
 
 # 文件列表,包括子目录
@@ -73,3 +74,12 @@ def get_file_ext(source_file):
 
 def is_dir(path):
     return os.path.isdir(path)
+
+
+def get_disklist():
+    disk_list = []
+    for c in string.ascii_uppercase:
+        disk = c + ':/'
+        if os.path.isdir(disk):
+            disk_list.append(disk)
+    return disk_list

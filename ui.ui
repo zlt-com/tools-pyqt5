@@ -20,9 +20,9 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="tab_main">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -460,11 +460,11 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QTabWidget" name="tabWidget_2">
+          <widget class="QTabWidget" name="tab_scan_result">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
-           <widget class="QWidget" name="tab_4">
+           <widget class="QWidget" name="tab_scan_file_list">
             <attribute name="title">
              <string>扫描到的文件</string>
             </attribute>
@@ -474,13 +474,13 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="tab_5">
+           <widget class="QWidget" name="tab_parser_keyword">
             <attribute name="title">
-             <string>与关键字匹配的文件</string>
+             <string>包含关键字的文件</string>
             </attribute>
             <layout class="QGridLayout" name="gridLayout_7">
              <item row="0" column="0">
-              <widget class="QTextEdit" name="tab3_text_match_file"/>
+              <widget class="QTextEdit" name="tab3_text_parser_file"/>
              </item>
             </layout>
            </widget>
@@ -576,6 +576,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tab_main</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>MainPage</receiver>
+   <slot>tab_change()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>307</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>-11</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_btn_scan</sender>
+   <signal>clicked()</signal>
+   <receiver>MainPage</receiver>
+   <slot>scan_disk()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>688</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>985</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>btn_select_file()</slot>
@@ -583,5 +615,7 @@
   <slot>target_file_type_select_change()</slot>
   <slot>parser_web_site_content()</slot>
   <slot>file_conv_select_save_directory()</slot>
+  <slot>tab_change()</slot>
+  <slot>scan_disk()</slot>
  </slots>
 </ui>
