@@ -75,7 +75,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
 
     # 文件选择按钮
     def btn_select_file(self):
-        file_type = "*." + self.source_file_type_select.currentData()
+        file_type = f"*.{self.source_file_type_select.currentData()}"
         if self.source_file_type_select.currentData() == "image":
             file_type = "*.jpg;*.jpeg;*.png"
         root = 'C:/Users/jerry/Documents/'
@@ -108,8 +108,6 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         if file_util.is_dir(file_path_text):
             file_type = self.source_file_type_select.currentData()
             self.files, _ = file_util.get_files_all(file_path_text, [file_type])
-            if len(self.files) == 0:
-                pass
         # 不是文件夹就是文件
         else:
             self.files = file_path_text.split(";")
@@ -124,7 +122,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                 else:
                     for f in self.files:
                         log_file_name = f
-                        self.converter(f, out_put_dir)
+                        self.converter(log_file_name, out_put_dir)
                 while self.conv_count == len(self.files):
                     print("转换结束")
                     break
@@ -132,7 +130,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                 print(e)
                 self.conv_count += 1
                 self.file_conv_result_text. \
-                    setPlainText(self.file_conv_result_text.toPlainText() + log_file_name + " 转换失败。" + "\r\n")
+                        setPlainText(self.file_conv_result_text.toPlainText() + log_file_name + " 转换失败。" + "\r\n")
         # self.btn_file_conv.setDisabled(False)
 
     def converter(self, f, out_put_dir):
@@ -149,10 +147,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                 log_file_name = f
                 self.conv_count += 1
             self.file_conv_progress_bar.setValue(self.conv_count)
-            self.file_conv_result_text. \
-                setPlainText(log_file_name
-                             + " 转换为" + self.target_file_type_select.currentText() + "成功。\r\n" +
-                             self.file_conv_result_text.toPlainText())
+            self.file_conv_result_text.setText(f"{log_file_name} 转换为{self.target_file_type_select.currentText()}成功。\r\n{self.file_conv_result_text.toPlainText()}")
         except Exception as e:
             print(e)
 
