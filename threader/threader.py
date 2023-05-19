@@ -2,7 +2,7 @@ import os
 import shutil
 
 import pythoncom
-from PyQt5.QtCore import QRunnable
+from PyQt5.QtCore import QRunnable, QWaitCondition, QMutex
 
 from common import file_util
 from scan.scan import ScanFile
@@ -10,31 +10,48 @@ from scan.scan import ScanFile
 
 # 扫描文件关键字进程
 class ScanFileLogThread(QRunnable):
+    file_types = ["docx", "txt", "pdf", "xlsx", "html"]
+
     def __init__(self, signal, disk):
         super().__init__()
         self.disk = disk
         self.signal = signal
+        self._isPause = False
+        self.cond = QWaitCondition()
+        self.mutex = QMutex()
 
-    file_types = ["docx", "txt", "pdf", "xlsx", "html"]
+    def pause(self):
+        self._isPause = True
+
+    def resume(self):
+        self._isPause = False
+        self.cond.wakeAll()
 
     def iter_file(self, disk):
         try:
             fs = os.listdir(disk)
             for f in fs:
+                self.mutex.lock()
+                if self._isPause:
+                    self.cond.wait(self.mutex)
                 if f[0] in [".", "$"]:
+                    self.mutex.unlock()
                     continue
                 f = os.path.join(disk, f)
                 if os.path.isdir(f):
+                    self.mutex.unlock()
                     self.iter_file(f)
                 else:
                     ext = file_util.get_file_ext(f)
                     if ext in self.file_types:
                         self.signal.emit(f)
+                    self.mutex.unlock()
         except Exception as e:
             print(e)
 
     def run(self):
         self.iter_file(self.disk)
+        self.signal.emit("done")
 
 
 # 解析到关键字的文件
@@ -111,4 +128,3 @@ class FileConvertThread(QRunnable):
             self.signal.emit(self.f)
         except Exception as e:
             print(self.f, e)
-

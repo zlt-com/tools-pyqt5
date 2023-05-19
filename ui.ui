@@ -478,7 +478,7 @@
            </widget>
            <widget class="QWidget" name="tab_parser_keyword">
             <attribute name="title">
-             <string>包含关键字的文件</string>
+             <string>扫描到的关键字</string>
             </attribute>
             <layout class="QGridLayout" name="gridLayout_7">
              <item row="0" column="0">

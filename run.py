@@ -1,4 +1,6 @@
 import os
+import threading
+import time
 
 from PyQt5.QtCore import pyqtSignal, QThreadPool
 
@@ -28,10 +30,14 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.pool = QThreadPool()
         self.pool.globalInstance()
         self.pool.setMaxThreadCount(10)  # 设置最大线程数
+        self.scan_threads = []  # 扫描线程组，全盘扫描
+
+        # 初始化扫描日志表格
         self.tab3_table_scan_files.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tab3_table_parser_files.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tab3_combox_select_disk.addItem(os.getcwd())
 
+        # 文本框日志信号
         self.file_convert_log_text_signal.connect(self.write_file_convert_log)
         self.scan_file_log_text_signal.connect(self.write_scan_file_log)
         self.scan_file_keyword_signal.connect(self.write_parser_scan_file_log)
@@ -202,19 +208,34 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
 
     # 开始扫描并处理
     def scan_disk(self):
-        self.pool.
+        if self.tab3_btn_scan.text() == "停止扫描":
+            for thread in self.scan_threads:
+                thread.pause()
+            self.tab3_btn_scan.setText("继续扫描")
+            return
+        elif self.tab3_btn_scan.text() == "继续扫描":
+            for thread in self.scan_threads:
+                thread.resume()
+            self.tab3_btn_scan.setText("停止扫描")
+            return
         if self.tab3_checkbox_scan_all_disk.isChecked():
             disks = file_util.get_disklist()
             for disk in disks:
                 scan_thread = ScanFileLogThread(disk=disk, signal=self.scan_file_log_text_signal)
-                self.pool.start(scan_thread)
+                self.scan_threads.append(scan_thread)
         else:
             d = self.tab3_combox_select_disk.currentText()
             scan_thread = ScanFileLogThread(disk=d, signal=self.scan_file_log_text_signal)
+            self.scan_threads.append(scan_thread)
+        for scan_thread in self.scan_threads:
             self.pool.start(scan_thread)
+        self.tab3_btn_scan.setText("停止扫描")
 
     # 扫描日志写入文本框
     def write_scan_file_log(self, text):
+        if text == "done":
+            self.tab3_btn_scan.setText("开始扫描")
+            return
         self.scan_files.append(text)
         row_count = self.tab3_table_scan_files.rowCount()
         self.tab3_table_scan_files.insertRow(row_count)
