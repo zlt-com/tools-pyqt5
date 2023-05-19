@@ -1,9 +1,9 @@
+import base64
 import os
-import threading
-import time
 
 from PyQt5.QtCore import pyqtSignal, QThreadPool
 
+from icon import Icon
 from scan.scan import ParserResult
 from common import file_util, constant
 from PyQt5 import QtWidgets, QtGui
@@ -32,10 +32,14 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.pool.setMaxThreadCount(10)  # 设置最大线程数
         self.scan_threads = []  # 扫描线程组，全盘扫描
 
+        # 初始化扫描磁盘下拉框
+        disks = file_util.get_disklist()
+        for d in disks:
+            self.tab3_combox_select_disk.addItem(d, d)
+
         # 初始化扫描日志表格
         self.tab3_table_scan_files.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tab3_table_parser_files.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.tab3_combox_select_disk.addItem(os.getcwd())
 
         # 文本框日志信号
         self.file_convert_log_text_signal.connect(self.write_file_convert_log)
@@ -122,7 +126,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                         log_file_name = f
                         self.converter(f, out_put_dir)
                 while self.conv_count == len(self.files):
-                    print("转换结束，跳出循环")
+                    print("转换结束")
                     break
             except Exception as e:
                 print(e)
@@ -218,6 +222,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
                 thread.resume()
             self.tab3_btn_scan.setText("停止扫描")
             return
+        self.scan_threads = []
         if self.tab3_checkbox_scan_all_disk.isChecked():
             disks = file_util.get_disklist()
             for disk in disks:
@@ -227,15 +232,15 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
             d = self.tab3_combox_select_disk.currentText()
             scan_thread = ScanFileLogThread(disk=d, signal=self.scan_file_log_text_signal)
             self.scan_threads.append(scan_thread)
-        for scan_thread in self.scan_threads:
-            self.pool.start(scan_thread)
+        for st in self.scan_threads:
+            self.pool.start(st)
         self.tab3_btn_scan.setText("停止扫描")
 
     # 扫描日志写入文本框
     def write_scan_file_log(self, text):
-        if text == "done":
+        if text == "done" or self.pool.activeThreadCount() == 0:
             self.tab3_btn_scan.setText("开始扫描")
-            return
+
         self.scan_files.append(text)
         row_count = self.tab3_table_scan_files.rowCount()
         self.tab3_table_scan_files.insertRow(row_count)
@@ -248,7 +253,8 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
         self.pool.start(parser_thread)
 
     def write_parser_scan_file_log(self, result):
-        self.parser_keyword_files.append(result.file)
+        if len(result.keys) > 0:
+            self.parser_keyword_files.append(result.file)
         for i in range(len(result.keys)):
             row_count = self.tab3_table_parser_files.rowCount()
             self.tab3_table_parser_files.insertRow(row_count)
@@ -256,7 +262,7 @@ class Run(QtWidgets.QWidget, Ui_MainPage):
             self.tab3_table_parser_files.setItem(row_count, 1, QtWidgets.QTableWidgetItem(result.keys[i]))
             self.tab3_table_parser_files.setItem(row_count, 2, QtWidgets.QTableWidgetItem(result.context[i]))
             self.tab3_table_parser_files.scrollToBottom()
-        tab_title = "包含关键字的文件({0})".format(len(self.parser_keyword_files))
+        tab_title = "包含关键字文件数量({0})".format(len(self.parser_keyword_files))
         self.tab_scan_result.setTabText(1, tab_title)
 
 
@@ -265,9 +271,12 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     ui = Run()
-    ico_path = os.path.join(os.path.dirname(__file__), './resource/logo.ico')
+    with open('tmp.ico', 'wb') as tmp:
+        tmp.write(base64.b64decode(Icon().img))
+    # ico_path = os.path.join(os.path.dirname(__file__), './resource/logo.ico')
     icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(ico_path))
+    icon.addPixmap(QtGui.QBitmap("tmp.ico"))
     ui.setWindowIcon(icon)
     ui.show()
+    os.remove("tmp.ico")
     sys.exit(app.exec_())

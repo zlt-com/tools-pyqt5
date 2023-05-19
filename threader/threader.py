@@ -1,7 +1,6 @@
 import os
 import shutil
 
-import pythoncom
 from PyQt5.QtCore import QRunnable, QWaitCondition, QMutex
 
 from common import file_util

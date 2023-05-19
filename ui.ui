@@ -22,7 +22,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tab_main">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -478,7 +478,7 @@
            </widget>
            <widget class="QWidget" name="tab_parser_keyword">
             <attribute name="title">
-             <string>扫描到的关键字</string>
+             <string>包含关键字文件数量</string>
             </attribute>
             <layout class="QGridLayout" name="gridLayout_7">
              <item row="0" column="0">

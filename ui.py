@@ -231,7 +231,7 @@ class Ui_MainPage(object):
         self.gridLayout.addWidget(self.tab_main, 0, 0, 1, 1)
 
         self.retranslateUi(MainPage)
-        self.tab_main.setCurrentIndex(2)
+        self.tab_main.setCurrentIndex(0)
         self.tab_scan_result.setCurrentIndex(0)
         self.btn_file_con_select.clicked.connect(MainPage.btn_select_file) # type: ignore
         self.btn_file_conv.clicked.connect(MainPage.btn_conv) # type: ignore
@@ -279,6 +279,6 @@ class Ui_MainPage(object):
         item.setText(_translate("MainPage", "关键字"))
         item = self.tab3_table_parser_files.horizontalHeaderItem(2)
         item.setText(_translate("MainPage", "上下文"))
-        self.tab_scan_result.setTabText(self.tab_scan_result.indexOf(self.tab_parser_keyword), _translate("MainPage", "扫描到的关键字"))
+        self.tab_scan_result.setTabText(self.tab_scan_result.indexOf(self.tab_parser_keyword), _translate("MainPage", "包含关键字文件数量"))
         self.tab3_text_keywords.setPlainText(_translate("MainPage", "舆情 西藏 网络舆情 新疆棉"))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_3), _translate("MainPage", "关键字扫描"))

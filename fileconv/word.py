@@ -5,8 +5,6 @@ from fileconv.converter import FileConverter
 from win32com.client import Dispatch
 
 
-
-
 class DocxConverter(FileConverter):
     def __init__(self):
         super(DocxConverter, self).__init__()
