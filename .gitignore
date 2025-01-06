@@ -7,3 +7,8 @@ build/*
 dist/*
 *.spec
 .vscode/settings.json
+._request.txt
+web/._parser_gov.py
+.gitignore
+server.log
+bmp.log

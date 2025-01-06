@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-import os
+import os,platform
 import string
 
 
@@ -78,8 +78,13 @@ def is_dir(path):
 
 def get_disklist():
     disk_list = []
-    for c in string.ascii_uppercase:
-        disk = c + ':/'
-        if os.path.isdir(disk):
-            disk_list.append(disk)
+    if platform.system()=="Windows":
+        for c in string.ascii_uppercase:
+            disk = c + ':/'
+            if os.path.isdir(disk):
+                disk_list.append(disk)
+    else:
+        _,dirs = get_files("/")
+        for dir in dirs:
+            disk_list.append("/" + dir)
     return disk_list
