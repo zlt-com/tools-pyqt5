@@ -10,7 +10,8 @@ import time
 
 sleep_second = 1
 login_page = "http://221.199.189.180:8090/cns-bmfw-web/bmfw/bmfwnewlogin/login"
-browsermobproxy_location = "/Users/jerry/Downloads/browsermob-proxy-2.1.4/bin/browsermob-proxy"
+proxy_path = "/Users/jerry/Downloads/browsermob-proxy-2.1.4/bin/browsermob-proxy"
+driver_path = "/Users/jerry/Downloads/chromedriver-mac-x64/chromedriver"
 
 
 # 设置浏览器、启动浏览器
@@ -20,7 +21,7 @@ def initBrowser():
     option.add_experimental_option("detach", True)
     option.add_argument("--proxy-server=%s" % proxy.proxy)
     browser = webdriver.Chrome(
-        service=Service("/Users/jerry/Downloads/chromedriver-mac-x64/chromedriver"),
+        service=Service(driver_path),
         options=option,
     )
 
@@ -108,7 +109,7 @@ def assigned_task():
     time.sleep(sleep_second/2)
 
 if __name__ == "__main__":
-    server = Server(browsermobproxy_location)
+    server = Server(proxy_path)
     server.start()
     proxy = server.create_proxy()
 
